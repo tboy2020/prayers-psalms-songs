@@ -87,6 +87,27 @@
   .playfull{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:11px;padding:9px 15px;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1407}
   .vz{color:#eaf1fb;font-size:15.5px;line-height:1.66}
   .vz .vn{color:var(--gold);font-weight:700;font-size:10.5px;vertical-align:super;margin-right:2px}
+  .bref{color:var(--gold);font-weight:700;cursor:pointer;border-bottom:1px dotted rgba(227,189,90,.55)}
+  .pill[data-ref]{cursor:pointer}
+  .exlist{display:flex;flex-direction:column;gap:10px;margin-top:13px}
+  .exline{font-size:14px;line-height:1.5;color:var(--muted);display:flex;gap:8px;align-items:baseline}
+  .exline .dot{color:var(--gold);flex:none}
+  .exnote{color:var(--muted)}
+  .card.block{padding:16px 16px 18px}
+  .card.block>h3{margin-bottom:7px}
+  .card.block .meta{font-size:15px;line-height:1.6;color:#cbdcf4;margin-top:0}
+  .bible-head{position:sticky;top:0;z-index:6;background:#0e1c30;padding:6px 0 10px;margin-bottom:4px}
+  .brow{display:flex;gap:8px;align-items:center}
+  .bnav{border:1px solid var(--line);background:var(--navy2);color:var(--gold-soft);border-radius:10px;height:42px;min-width:46px;font-size:17px;font-weight:800;cursor:pointer}
+  .bsel{flex:1;min-width:0;display:flex;gap:7px}
+  .bsel select{flex:1;min-width:0;background:var(--navy2);color:var(--ink);border:1px solid var(--line);border-radius:10px;height:42px;font-family:inherit;font-size:15px;padding:0 8px}
+  .btitle{font-family:'Fraunces',serif;color:var(--gold-soft);font-size:21px;margin:10px 2px 4px}
+  .breadbtn{display:inline-flex;align-items:center;gap:7px;border:0;border-radius:11px;padding:11px 17px;font-family:inherit;font-weight:800;font-size:14.5px;cursor:pointer;background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1407;margin:2px 0 14px}
+  .bverses{font-size:17px;line-height:1.75;color:#eef3fb}
+  .bv{cursor:pointer;border-radius:6px}
+  .bv .vn{color:var(--gold);font-weight:700;font-size:11px;vertical-align:super;margin-right:3px}
+  .bv.hl{background:rgba(227,189,90,.18);box-shadow:0 0 0 3px rgba(227,189,90,.18)}
+  .bload{text-align:center;color:var(--gold-soft);font-family:'Fraunces',serif;font-size:18px;padding:48px 10px}
   .sechead{font-family:'Fraunces',serif;color:var(--gold-soft);font-size:16px;margin:16px 2px 9px;display:flex;align-items:center;gap:8px}
   .sechead .n{font-family:'Baloo 2';font-weight:700;font-size:12.5px;color:var(--muted)}
 
@@ -174,7 +195,7 @@
   var navEl=document.getElementById('nav');
   function buildNav(){ navEl.innerHTML=''; TABS.forEach(function(t){ var b=document.createElement('button');
     b.className='tab'+(state.tab===t[0]?' on':''); b.textContent=t[1];
-    b.onclick=function(){ state.tab=t[0]; state.detail=null; state.favOnly=false; state.pcat=null; state.scat=null; state.psCat=null; window.scrollTo(0,0); render(); };
+    b.onclick=function(){ state.tab=t[0]; state.bible=null; state.detail=null; state.favOnly=false; state.pcat=null; state.scat=null; state.psCat=null; window.scrollTo(0,0); render(); };
     navEl.appendChild(b); }); }
 
   // ---- helpers ----
@@ -204,13 +225,14 @@
       var showing=panel.classList.toggle('show');
       b.innerHTML = showing ? (kind==='psalm'?'📖 Hide Psalm':'📖 Hide passage') : (kind==='psalm'?'📖 Read full Psalm':'📖 Read full passage');
     }; });
+    view.querySelectorAll('[data-ref]').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); openBible(b.getAttribute('data-ref')); }; });
   }
   function psalmById(n){ for(var i=0;i<D.psalms.length;i++){ if(D.psalms[i].number===n) return D.psalms[i]; } return null; }
   function songByRef(r){ for(var i=0;i<D.songs.length;i++){ if(D.songs[i].reference===r) return D.songs[i]; } return null; }
 
   // ---- card renderers ----
   function psalmCard(p){
-    var v = p.key_verse_quote ? '<div class="verse">“'+esc(p.key_verse_quote)+'”</div><div class="ref">'+esc(p.key_verse_ref)+'</div>' : '';
+    var v = p.key_verse_quote ? '<div class="verse">“'+esc(p.key_verse_quote)+'”</div><div class="ref">'+refSpan(p.key_verse_ref)+'</div>' : '';
     var speakTxt = (p.key_verse_quote? p.key_verse_quote+'. ':'')+(p.key_verse_ref||'');
     return '<div class="card"><div class="row"><h3>Psalm '+p.number+' — '+esc(p.title||'')+'</h3><span class="pill soft">'+esc(p.category||'')+'</span></div>'
       + (p.situation?'<div class="when">'+esc(p.situation)+'</div>':'')
@@ -219,10 +241,10 @@
       + '<div class="full"></div></div>';
   }
   function songCard(s){
-    var v = s.key_line_quote ? '<div class="verse">“'+esc(s.key_line_quote)+'”</div><div class="ref">'+esc(s.key_line_ref||s.reference)+'</div>':'';
+    var v = s.key_line_quote ? '<div class="verse">“'+esc(s.key_line_quote)+'”</div><div class="ref">'+refSpan(s.key_line_ref||s.reference)+'</div>':'';
     var speakTxt=(s.key_line_quote? s.key_line_quote+'. ':'')+(s.key_line_ref||s.reference||'');
     return '<div class="card"><div class="row"><h3>'+esc(s.title||'')+'</h3><span class="pill soft">'+esc(s.category||'')+'</span></div>'
-      + '<div class="ref" style="margin-bottom:4px">'+esc(s.reference||'')+(s.singer?' · '+esc(s.singer):'')+'</div>'
+      + '<div class="ref" style="margin-bottom:4px">'+refSpan(s.reference)+(s.singer?' · '+esc(s.singer):'')+'</div>'
       + (s.situation?'<div class="when">'+esc(s.situation)+'</div>':'')
       + v
       + '<div class="acts">'+spkBtn(speakTxt)+'<button class="readfull" data-openfull="song" data-id="'+esc(s.reference)+'">📖 Read full passage</button>'+starBtn('songs',s.reference)+'</div>'
@@ -232,7 +254,7 @@
   function prayerCard(p){
     var speakTxt=(p.quote? p.quote+'. ':'')+(p.reference||'');
     return '<div class="card"><div class="row"><h3>'+esc(p.pray_er||'')+'</h3><span class="pill soft">'+esc(OUTCOME_BADGE[p.outcome_type]||p.outcome_type||'')+'</span></div>'
-      + '<div class="ref" style="margin-bottom:4px">'+esc(p.reference||'')+'</div>'
+      + '<div class="ref" style="margin-bottom:4px">'+refSpan(p.reference)+'</div>'
       + (p.content?'<div class="meta"><b>Prayed:</b> '+esc(p.content)+'</div>':'')
       + (p.result?'<div class="meta"><b>Result:</b> '+esc(p.result)+'</div>':'')
       + (p.quote?'<div class="verse">“'+esc(p.quote)+'”</div>':'')
@@ -323,21 +345,19 @@
     }
     if(state.sub==='great'){
       body='<div class="count">24 landmark prayers to study</div>'+D.greatPrayers.map(function(g){
-        return '<div class="card"><div class="row"><h3>'+esc(g.who)+'</h3><span class="pill">'+esc(g.reference)+'</span></div><div class="meta">'+esc(g.why)+'</div>'
-          +'<div class="acts">'+spkBtn((g.who||'')+'. '+(g.reference||''))+'</div></div>'; }).join('');
+        return '<div class="card block"><div class="row"><h3>'+esc(g.who)+'</h3><span class="pill" data-ref="'+esc(g.reference)+'">'+esc(g.reference)+'</span></div><div class="meta">'+esc(g.why)+'</div>'
+          +'<div class="acts">'+spkBtn((g.who||'')+'. '+(g.reference||''))+'<button class="readfull" data-ref="'+esc(g.reference)+'">📖 Read in the Bible</button></div></div>'; }).join('');
       view.innerHTML=sub+body; bindSub(); bindCards(); return;
     }
     if(state.sub==='patterns'){
       body='<div class="verse-top">What God answers — and how</div>'+D.prayerPatterns.map(function(p){
-        return '<div class="card"><h3>'+esc(p.pattern)+'</h3><div class="meta">'+esc(p.insight)+'</div>'
-          +(p.examples&&p.examples.length?'<div class="when" style="margin-top:7px">'+p.examples.map(esc).join(' · ')+'</div>':'')+'</div>'; }).join('');
-      view.innerHTML=sub+body; bindSub(); return;
+        return '<div class="card block"><h3>'+esc(p.pattern)+'</h3><div class="meta">'+esc(p.insight)+'</div>'+exampleList(p.examples)+'</div>'; }).join('');
+      view.innerHTML=sub+body; bindSub(); bindCards(); return;
     }
     if(state.sub==='outcomes'){
       body='<div class="verse-top">“Answered” is bigger than “granted”</div>'+D.prayerOutcomes.map(function(o){
-        return '<div class="card"><div class="row"><h3>'+esc(OUTCOME_BADGE[o.type]||o.type)+'</h3><span class="pill">'+(o.count||'')+'</span></div><div class="meta">'+esc(o.meaning)+'</div>'
-          +(o.examples&&o.examples.length?'<div class="when" style="margin-top:7px">'+o.examples.map(esc).join(' · ')+'</div>':'')+'</div>'; }).join('');
-      view.innerHTML=sub+body; bindSub(); return;
+        return '<div class="card block"><div class="row"><h3>'+esc(OUTCOME_BADGE[o.type]||o.type)+'</h3><span class="pill">'+(o.count||'')+'</span></div><div class="meta">'+esc(o.meaning)+'</div>'+exampleList(o.examples)+'</div>'; }).join('');
+      view.innerHTML=sub+body; bindSub(); bindCards(); return;
     }
   }
   function bindSub(){ view.querySelectorAll('[data-sub]').forEach(function(b){ b.onclick=function(){ state.sub=b.getAttribute('data-sub'); state.pcat=null; state.favOnly=false; window.scrollTo(0,0); render(); }; }); }
@@ -348,8 +368,77 @@
 
   function uniq(a){ var o={},r=[]; a.forEach(function(x){ if(x&&!o[x]){o[x]=1;r.push(x);} }); return r; }
 
+  // ---- Bible reader (full KJV, lazy-loaded) ----
+  var BOOKS=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','Song of Solomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation'];
+  function refSpan(t){ if(!t) return ''; return '<span class="bref" data-ref="'+esc(t)+'">'+esc(t)+'</span>'; }
+  function parseRef(refStr){
+    var s=(refStr||'').replace(/\([^)]*\)/g,'').split(';')[0].split(',')[0].trim();
+    var book=null; for(var i=0;i<BOOKS.length;i++){ if(s.indexOf(BOOKS[i])===0 && (!book||BOOKS[i].length>book.length)) book=BOOKS[i]; }
+    if(!book) return null;
+    var rest=s.slice(book.length).trim();
+    var m=rest.match(/^(\d+):(\d+)(?:\s*-\s*(?:(\d+):)?(\d+))?/);
+    if(!m){ var mc=rest.match(/^(\d+)/); return {book:book, ch:mc?+mc[1]:1, v1:1, v2:1}; }
+    var ch=+m[1], v1=+m[2], c2=m[3]?+m[3]:ch, v2=m[4]?+m[4]:v1;
+    return {book:book, ch:ch, v1:v1, v2:(c2===ch?v2:9999)};
+  }
+  var bibleLoading=null;
+  function loadBible(cb){ if(window.KJV){ cb(); return; } if(bibleLoading){ bibleLoading.push(cb); return; } bibleLoading=[cb];
+    var sc=document.createElement('script'); sc.src='bible.js';
+    sc.onload=function(){ var cbs=bibleLoading; bibleLoading=null; cbs.forEach(function(f){f();}); };
+    sc.onerror=function(){ bibleLoading=null; view.innerHTML='<div class="bload">Could not load the Bible text.</div>'; };
+    document.head.appendChild(sc);
+  }
+  function openBible(refStr){
+    state._ret={ tab:state.tab, sub:state.sub, detail:state.detail, pcat:state.pcat, psCat:state.psCat, scat:state.scat, favOnly:state.favOnly, q:state.q };
+    state.bible={loading:true}; view.innerHTML='<div class="bload">Opening the Word…</div>'; window.scrollTo(0,0);
+    loadBible(function(){ var p=parseRef(refStr)||{book:'Psalms',ch:1,v1:1,v2:1};
+      if(!(window.KJV&&window.KJV[p.book]&&window.KJV[p.book][p.ch])) p={book:'Psalms',ch:1,v1:1,v2:1};
+      state.bible={book:p.book,ch:p.ch,hl:[p.v1,p.v2]}; renderBible();
+    });
+  }
+  function bibleBack(){ var r=state._ret||{}; state.bible=null;
+    state.tab=r.tab||'situations'; state.sub=r.sub||'kinds'; state.detail=(r.detail===undefined?null:r.detail);
+    state.pcat=r.pcat||null; state.psCat=r.psCat||null; state.scat=r.scat||null; state.favOnly=!!r.favOnly; state.q=r.q||'';
+    render();
+  }
+  function chList(book){ return Object.keys((window.KJV&&window.KJV[book])||{}).map(Number).sort(function(a,b){return a-b;}); }
+  function gotoAdj(dir){
+    var b=state.bible, book=b.book, chs=chList(book), idx=chs.indexOf(b.ch);
+    if(idx+dir>=0 && idx+dir<chs.length){ state.bible={book:book,ch:chs[idx+dir],hl:null}; }
+    else { var bi=BOOKS.indexOf(book)+dir; while(bi>=0&&bi<BOOKS.length&&!window.KJV[BOOKS[bi]]) bi+=dir; if(bi<0||bi>=BOOKS.length) return; var nb=BOOKS[bi], ncs=chList(nb); state.bible={book:nb,ch:(dir>0?ncs[0]:ncs[ncs.length-1]),hl:null}; }
+    renderBible(); window.scrollTo(0,0);
+  }
+  function exampleList(exs){ if(!exs||!exs.length) return '';
+    return '<div class="exlist">'+exs.map(function(ex){ var i=ex.indexOf('('); var ref=(i>=0?ex.slice(0,i):ex).trim(); var note=(i>=0?ex.slice(i):'').trim();
+      return '<div class="exline"><span class="dot">•</span><span>'+refSpan(ref)+(note?' <span class="exnote">'+esc(note)+'</span>':'')+'</span></div>'; }).join('')+'</div>';
+  }
+  function renderBible(){
+    var b=state.bible; if(!b||b.loading) return;
+    var book=b.book, ch=b.ch, verses=(window.KJV[book]&&window.KJV[book][ch])||[], chs=chList(book);
+    var bookOpts=BOOKS.filter(function(x){return window.KJV[x];}).map(function(x){return '<option'+(x===book?' selected':'')+'>'+esc(x)+'</option>';}).join('');
+    var chOpts=chs.map(function(c){return '<option value="'+c+'"'+(c===ch?' selected':'')+'>'+c+'</option>';}).join('');
+    var html='<div class="bible-head"><button class="back" id="bexit">‹ Back</button>'
+      + '<div class="brow" style="margin-top:9px"><button class="bnav" id="bprev">◂</button>'
+      + '<div class="bsel"><select id="bbook">'+bookOpts+'</select><select id="bch">'+chOpts+'</select></div>'
+      + '<button class="bnav" id="bnext">▸</button></div></div>'
+      + '<div class="btitle">'+esc(book)+' '+ch+'</div>'
+      + '<button class="breadbtn" id="breadchap">🔊 Read whole chapter</button>'
+      + '<div class="bverses">'+verses.map(function(t,i){ var v=i+1; var hl=(b.hl&&v>=b.hl[0]&&v<=b.hl[1])?' hl':''; return '<span class="bv'+hl+'" data-rv="'+v+'"><span class="vn">'+v+'</span>'+esc(t)+'</span> '; }).join('')+'</div>'
+      + '<footer>Tap a verse to hear it · Glory to God alone · <span class="amhg">AMHG</span></footer>';
+    view.innerHTML=html;
+    document.getElementById('bexit').onclick=bibleBack;
+    document.getElementById('bprev').onclick=function(){ gotoAdj(-1); };
+    document.getElementById('bnext').onclick=function(){ gotoAdj(1); };
+    document.getElementById('bbook').onchange=function(){ state.bible={book:this.value,ch:1,hl:null}; renderBible(); window.scrollTo(0,0); };
+    document.getElementById('bch').onchange=function(){ state.bible={book:book,ch:+this.value,hl:null}; renderBible(); window.scrollTo(0,0); };
+    document.getElementById('breadchap').onclick=function(){ var pb=this; if('speechSynthesis'in window&&speechSynthesis.speaking){ speechSynthesis.cancel(); pb.innerHTML='🔊 Read whole chapter'; return; } speakVerses(verses.map(function(t){return {t:t};})); pb.innerHTML='⏹ Stop reading'; };
+    view.querySelectorAll('[data-rv]').forEach(function(el){ el.onclick=function(){ var v=+el.getAttribute('data-rv'); speak(window.KJV[book][ch][v-1]||''); }; });
+    if(b.hl){ var hlEl=view.querySelector('.bv.hl'); if(hlEl) setTimeout(function(){ hlEl.scrollIntoView({block:'center'}); },40); }
+  }
+
   function render(){
     buildNav();
+    if(state.bible){ if(!state.bible.loading) renderBible(); return; }
     if(state.tab==='situations') vSituations();
     else if(state.tab==='psalms') vPsalms();
     else if(state.tab==='songs') vSongs();
