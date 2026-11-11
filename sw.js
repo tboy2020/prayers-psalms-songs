@@ -1,5 +1,5 @@
 /* Prayers, Psalms & Songs — service worker. Bump CACHE on every change. */
-var CACHE = 'pss-v2';
+var CACHE = 'pss-v3';
 var SHELL = [
   './','./index.html','./app_data.js','./install-button.js','./manifest.webmanifest',
   './icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-512.png','./icons/apple-touch-icon-180.png'
