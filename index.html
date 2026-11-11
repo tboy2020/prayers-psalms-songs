@@ -94,6 +94,9 @@
   .exline .dot{color:var(--gold);flex:none}
   .exnote{color:#b4c6e2}
   .seeall{margin-top:12px}
+  .ochips{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+  .ochip{display:inline-flex;align-items:center;gap:5px;background:var(--navy2);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13.5px;font-weight:700;color:var(--gold-soft)}
+  .ochip small{color:var(--muted);font-weight:600;font-size:11.5px}
   .card.block{padding:16px 16px 18px}
   .card.block>h3{margin-bottom:7px}
   .card.block .meta{font-size:15.5px;line-height:1.62;color:#dce7f8;margin-top:0}
@@ -360,7 +363,12 @@
         body='<button class="back" id="back">‹ All outcomes</button><div class="sechead"><span>'+esc(OUTCOME_BADGE[state.pout]||state.pout)+'</span><span class="n">'+ol.length+'</span></div>'+ol.map(prayerCard).join('');
         view.innerHTML=sub+body; bindSub(); document.getElementById('back').onclick=function(){state.pout=null;render();}; bindCards(); return;
       }
-      body='<div class="verse-top">“Answered” is bigger than “granted”</div>'+D.prayerOutcomes.map(function(o){
+      var intro='<div class="card block" style="background:linear-gradient(165deg,#1d3a60,#15294466)">'
+        +'<h3 style="font-size:19px">“Answered” is bigger than “granted”</h3>'
+        +'<div class="meta"><b>Granted</b> means God gave the exact thing asked — a clear <b>yes</b>. <b>Answered</b> is the bigger word, because <b>God always responds</b>. His answer may be:</div>'
+        +'<div class="ochips"><span class="ochip">✅ Yes <small>granted</small></span><span class="ochip">🚫 No <small>denied</small></span><span class="ochip">⏳ Wait <small>delayed</small></span><span class="ochip">🔀 Something deeper <small>than asked</small></span></div>'
+        +'<div class="meta" style="margin-top:13px">So a prayer can be fully <b>answered</b> even when it isn\'t <b>granted</b> — Paul\'s thorn wasn\'t removed, but <i>“My grace is sufficient.”</i> God is never silent; He answers <b>every time</b>.</div></div>';
+      body=intro+D.prayerOutcomes.map(function(o){
         return '<div class="card block"><div class="row"><h3>'+esc(OUTCOME_BADGE[o.type]||o.type)+'</h3><span class="pill">'+(o.count||'')+'</span></div><div class="meta">'+esc(o.meaning)+'</div>'+exampleList(o.examples)+'<button class="readfull" data-pout="'+esc(o.type)+'" style="margin-top:13px">See all '+(o.count||'')+' prayers ›</button></div>'; }).join('');
       view.innerHTML=sub+body; bindSub(); bindCards();
       view.querySelectorAll('[data-pout]').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); state.pout=b.getAttribute('data-pout'); window.scrollTo(0,0); render(); }; });
