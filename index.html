@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prayers, Psalms &amp; Songs</title>
+<meta name="description" content="Tap what you're facing — and find the psalm to read, the song to sing, and the prayer to pray. Every prayer, psalm and song of the KJV, for every situation. Works offline.">
+<meta name="theme-color" content="#0f1e33">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prayers & Songs">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0f1e33; --navy2:#13263f; --card:#17304f; --card2:#1c3a5e;
+    --gold:#e3bd5a; --gold-soft:#f6e3a8; --ink:#eaf1fb; --muted:#9db4d4;
+    --line:rgba(227,189,90,.18); --shadow:0 10px 28px rgba(0,0,0,.34);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{font-family:'Baloo 2',system-ui,sans-serif;color:var(--ink);background:
+      radial-gradient(1100px 560px at 50% -12%, rgba(40,74,120,.5), transparent 60%),
+      radial-gradient(900px 480px at 100% 0%, rgba(227,189,90,.09), transparent 55%), var(--navy);
+    background-color:var(--navy);min-height:100vh;padding-bottom:84px;overflow-x:hidden}
+  .wrap{max-width:720px;margin:0 auto;padding:0 16px}
+
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,#0e1c30 70%,rgba(14,28,48,.0));padding:14px 0 6px}
+  .hbar{display:flex;align-items:center;gap:10px;max-width:720px;margin:0 auto;padding:0 16px}
+  .brand{flex:1;min-width:0}
+  .brand h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(19px,5.2vw,25px);margin:0;line-height:1;
+    background:linear-gradient(180deg,var(--gold-soft),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+  .iconbtn{flex:none;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--navy2);color:var(--gold-soft);
+    font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .iconbtn.on{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1407;border-color:transparent}
+
+  .search{max-width:720px;margin:8px auto 0;padding:0 16px;display:none}
+  .search.show{display:block}
+  .search input{width:100%;background:var(--navy2);border:1px solid var(--line);border-radius:14px;color:var(--ink);
+    font-family:inherit;font-size:16px;padding:12px 14px;outline:0}
+  .search input::placeholder{color:#6f87a9}
+
+  nav{display:flex;gap:8px;overflow-x:auto;padding:10px 16px 4px;max-width:720px;margin:0 auto;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  .tab{white-space:nowrap;border:1px solid var(--line);background:var(--navy2);color:var(--muted);font-family:inherit;font-weight:700;
+    font-size:14px;padding:9px 15px;border-radius:999px;cursor:pointer;transition:.15s}
+  .tab.on{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1407;border-color:transparent}
+
+  main{padding-top:10px}
+  .lead{font-family:'Fraunces',serif;font-style:italic;color:var(--gold-soft);font-size:17px;margin:6px 2px 14px;text-align:center}
+  .verse-top{color:var(--gold);font-family:'Fraunces',serif;font-style:italic;text-align:center;font-size:14px;margin:2px 2px 12px;opacity:.9}
+
+  /* situation tiles */
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  @media(min-width:520px){.tiles{grid-template-columns:1fr 1fr 1fr}}
+  .tile{display:flex;flex-direction:column;gap:7px;align-items:flex-start;text-align:left;cursor:pointer;
+    background:linear-gradient(165deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:16px;padding:14px 13px;box-shadow:var(--shadow)}
+  .tile:active{transform:scale(.98)}
+  .tile .emo{font-size:26px;line-height:1}
+  .tile .lab{font-weight:700;font-size:14px;line-height:1.2}
+
+  /* cards */
+  .card{background:linear-gradient(170deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:16px;
+    padding:14px 15px;box-shadow:var(--shadow);margin-bottom:11px}
+  .card .row{display:flex;align-items:flex-start;gap:10px}
+  .card h3{font-family:'Fraunces',serif;font-weight:600;font-size:17px;margin:0 0 2px;line-height:1.15;flex:1;min-width:0}
+  .pill{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;
+    color:#1a1407;background:linear-gradient(180deg,var(--gold-soft),var(--gold));border-radius:999px;padding:3px 9px}
+  .pill.soft{background:var(--navy2);color:var(--muted);border:1px solid var(--line)}
+  .when{color:var(--muted);font-size:13.5px;line-height:1.4;margin:6px 0 4px}
+  .verse{color:var(--gold-soft);font-family:'Fraunces',serif;font-style:italic;font-size:15px;line-height:1.4;margin:8px 0 2px}
+  .ref{color:var(--gold);font-size:12.5px;font-weight:700}
+  .meta{color:var(--muted);font-size:13px;line-height:1.45;margin:6px 0 0}
+  .meta b{color:var(--ink);font-weight:700}
+  .acts{display:flex;gap:8px;margin-top:10px}
+  .mini{border:1px solid var(--line);background:var(--navy2);color:var(--gold-soft);border-radius:10px;font-size:15px;
+    width:38px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .mini.star.on{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1a1407;border-color:transparent}
+  .sechead{font-family:'Fraunces',serif;color:var(--gold-soft);font-size:16px;margin:16px 2px 9px;display:flex;align-items:center;gap:8px}
+  .sechead .n{font-family:'Baloo 2';font-weight:700;font-size:12.5px;color:var(--muted)}
+
+  .subnav{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+  .subnav::-webkit-scrollbar{display:none}
+  .subtab{white-space:nowrap;border:1px solid var(--line);background:var(--navy2);color:var(--muted);font-family:inherit;font-weight:700;
+    font-size:13px;padding:7px 12px;border-radius:999px;cursor:pointer}
+  .subtab.on{background:var(--gold);color:#1a1407;border-color:transparent}
+
+  .back{display:inline-flex;align-items:center;gap:6px;color:var(--gold-soft);background:var(--navy2);border:1px solid var(--line);
+    border-radius:999px;padding:8px 14px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;margin:2px 0 12px}
+  .empty{text-align:center;color:var(--muted);padding:36px 10px}
+  .count{color:var(--muted);font-size:12.5px;margin:2px 2px 10px}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin:26px 0 6px;line-height:1.6}
+  footer .amhg{color:var(--gold);font-family:'Fraunces',serif;font-style:italic}
+  .chipbar{display:flex;gap:7px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none}.chipbar::-webkit-scrollbar{display:none}
+  .fchip{white-space:nowrap;border:1px solid var(--line);background:var(--navy2);color:var(--muted);font-family:inherit;font-weight:700;
+    font-size:12.5px;padding:6px 11px;border-radius:999px;cursor:pointer}
+  .fchip.on{background:var(--gold);color:#1a1407;border-color:transparent}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <div class="brand">
+      <h1>Prayers, Psalms &amp; Songs</h1>
+      <p>for every situation · KJV</p>
+    </div>
+    <button class="iconbtn" id="voiceBtn" title="Read aloud on/off">🔊</button>
+    <button class="iconbtn" id="searchBtn" title="Search">🔎</button>
+  </div>
+  <div class="search" id="searchWrap"><div class="wrap" style="padding:0"><input id="q" type="search" placeholder="Search psalms, songs, prayers…" autocomplete="off"></div></div>
+  <nav id="nav"></nav>
+</header>
+
+<main><div class="wrap" id="view"></div></main>
+
+<script src="app_data.js"></script>
+<script>
+(function(){
+  var D = window.PSS || {};
+  var esc = function(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+  var view = document.getElementById('view');
+
+  // ---- state ----
+  var state = { tab:'situations', sub:'kinds', detail:null, q:'', favOnly:false, pcat:null, scat:null, psCat:null };
+  var voiceOn = true;
+  try{ voiceOn = localStorage.getItem('pss_voice')!=='0'; }catch(e){}
+  var favs = { psalms:{}, songs:{}, prayers:{} };
+  try{ favs = JSON.parse(localStorage.getItem('pss_favs')) || favs; }catch(e){}
+  function saveFavs(){ try{ localStorage.setItem('pss_favs', JSON.stringify(favs)); }catch(e){} }
+
+  // ---- voice ----
+  function speak(text){
+    if(!voiceOn || !('speechSynthesis' in window)) return;
+    try{ var u=new SpeechSynthesisUtterance(text); u.rate=0.9; u.pitch=1.0;
+      var vs=speechSynthesis.getVoices(); var en=vs.filter(function(v){return /^en/i.test(v.lang);});
+      if(en.length) u.voice = en.find(function(v){return /US|GB/i.test(v.lang);})||en[0];
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged=function(){}; speechSynthesis.getVoices(); }
+
+  var vb=document.getElementById('voiceBtn');
+  function syncVoiceBtn(){ vb.classList.toggle('on',voiceOn); vb.textContent = voiceOn?'🔊':'🔇'; }
+  vb.addEventListener('click',function(){ voiceOn=!voiceOn; try{localStorage.setItem('pss_voice',voiceOn?'1':'0');}catch(e){} if(!voiceOn&&'speechSynthesis'in window)speechSynthesis.cancel(); syncVoiceBtn(); });
+  syncVoiceBtn();
+
+  // ---- search ----
+  var sw=document.getElementById('searchWrap'), qEl=document.getElementById('q');
+  document.getElementById('searchBtn').addEventListener('click',function(){ sw.classList.toggle('show'); if(sw.classList.contains('show')){ qEl.focus(); } else { qEl.value=''; state.q=''; render(); } });
+  qEl.addEventListener('input',function(){ state.q=this.value.trim().toLowerCase(); render(); });
+
+  // ---- nav ----
+  var TABS=[['situations','🧭 Situations'],['psalms','📖 Psalms'],['songs','🎵 Songs'],['prayers','🙏 Prayers']];
+  var navEl=document.getElementById('nav');
+  function buildNav(){ navEl.innerHTML=''; TABS.forEach(function(t){ var b=document.createElement('button');
+    b.className='tab'+(state.tab===t[0]?' on':''); b.textContent=t[1];
+    b.onclick=function(){ state.tab=t[0]; state.detail=null; state.favOnly=false; state.pcat=null; state.scat=null; state.psCat=null; window.scrollTo(0,0); render(); };
+    navEl.appendChild(b); }); }
+
+  // ---- helpers ----
+  function starBtn(kind,id){ var on=!!favs[kind][id];
+    return '<button class="mini star'+(on?' on':'')+'" data-star="'+kind+'" data-id="'+esc(id)+'" title="Save">'+(on?'★':'☆')+'</button>'; }
+  function spkBtn(text){ return '<button class="mini" data-speak="'+esc(text)+'" title="Read aloud">🔊</button>'; }
+  function bindCards(){
+    view.querySelectorAll('[data-speak]').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); speak(b.getAttribute('data-speak')); }; });
+    view.querySelectorAll('[data-star]').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); var k=b.getAttribute('data-star'), id=b.getAttribute('data-id');
+      if(favs[k][id]){ delete favs[k][id]; } else { favs[k][id]=1; } saveFavs(); render(); }; });
+  }
+  function psalmById(n){ for(var i=0;i<D.psalms.length;i++){ if(D.psalms[i].number===n) return D.psalms[i]; } return null; }
+  function songByRef(r){ for(var i=0;i<D.songs.length;i++){ if(D.songs[i].reference===r) return D.songs[i]; } return null; }
+
+  // ---- card renderers ----
+  function psalmCard(p){
+    var v = p.key_verse_quote ? '<div class="verse">“'+esc(p.key_verse_quote)+'”</div><div class="ref">'+esc(p.key_verse_ref)+'</div>' : '';
+    var speakTxt = (p.key_verse_quote? p.key_verse_quote+'. ':'')+(p.key_verse_ref||'');
+    return '<div class="card"><div class="row"><h3>Psalm '+p.number+' — '+esc(p.title||'')+'</h3><span class="pill soft">'+esc(p.category||'')+'</span></div>'
+      + (p.situation?'<div class="when">'+esc(p.situation)+'</div>':'')
+      + v
+      + '<div class="acts">'+spkBtn(speakTxt)+starBtn('psalms',p.number)+'</div></div>';
+  }
+  function songCard(s){
+    var v = s.key_line_quote ? '<div class="verse">“'+esc(s.key_line_quote)+'”</div><div class="ref">'+esc(s.key_line_ref||s.reference)+'</div>':'';
+    var speakTxt=(s.key_line_quote? s.key_line_quote+'. ':'')+(s.key_line_ref||s.reference||'');
+    return '<div class="card"><div class="row"><h3>'+esc(s.title||'')+'</h3><span class="pill soft">'+esc(s.category||'')+'</span></div>'
+      + '<div class="ref" style="margin-bottom:4px">'+esc(s.reference||'')+(s.singer?' · '+esc(s.singer):'')+'</div>'
+      + (s.situation?'<div class="when">'+esc(s.situation)+'</div>':'')
+      + v
+      + '<div class="acts">'+spkBtn(speakTxt)+starBtn('songs',s.reference)+'</div></div>';
+  }
+  var OUTCOME_BADGE={ 'granted':'✅ granted','denied':'🚫 denied','delayed':'⏳ delayed','answered-differently':'🔀 answered differently','conditional':'📜 conditional','unstated-or-ongoing':'🕊️ ongoing' };
+  function prayerCard(p){
+    var speakTxt=(p.quote? p.quote+'. ':'')+(p.reference||'');
+    return '<div class="card"><div class="row"><h3>'+esc(p.pray_er||'')+'</h3><span class="pill soft">'+esc(OUTCOME_BADGE[p.outcome_type]||p.outcome_type||'')+'</span></div>'
+      + '<div class="ref" style="margin-bottom:4px">'+esc(p.reference||'')+'</div>'
+      + (p.content?'<div class="meta"><b>Prayed:</b> '+esc(p.content)+'</div>':'')
+      + (p.result?'<div class="meta"><b>Result:</b> '+esc(p.result)+'</div>':'')
+      + (p.quote?'<div class="verse">“'+esc(p.quote)+'”</div>':'')
+      + '<div class="acts">'+spkBtn(speakTxt)+starBtn('prayers',p.reference)+'</div></div>';
+  }
+
+  // ---- views ----
+  function vSituations(){
+    if(state.detail!=null){ return vSituationDetail(state.detail); }
+    var q=state.q;
+    var list=D.situations.map(function(s,i){ return {s:s,i:i}; });
+    if(q) list=list.filter(function(o){ return (o.s.situation||'').toLowerCase().indexOf(q)>=0 || (o.s.note||'').toLowerCase().indexOf(q)>=0; });
+    var tiles=list.map(function(o){ return '<div class="tile" data-sit="'+o.i+'"><span class="emo">'+(o.s.emoji||'🙏')+'</span><span class="lab">'+esc((o.s.situation||'').replace(/^When\s+/i,'').replace(/^you(?:'re| are)?\s+/i,'').replace(/^the\s+/i,'')).replace(/^\w/,function(c){return c.toUpperCase();})+'</span></div>'; }).join('');
+    var html='<div class="lead">What are you facing today?</div><div class="verse-top">“Is any afflicted? let him pray. Is any merry? let him sing psalms.” — James 5:13</div><div class="tiles">'+tiles+'</div>'
+      + '<footer>Tap how you feel — find the psalm to read, the song to sing.<br>Glory to God alone · <span class="amhg">AMHG</span></footer>';
+    view.innerHTML=html;
+    view.querySelectorAll('[data-sit]').forEach(function(t){ t.onclick=function(){ state.detail=+t.getAttribute('data-sit'); window.scrollTo(0,0); render(); }; });
+  }
+  function vSituationDetail(i){
+    var s=D.situations[i]; if(!s){ state.detail=null; return vSituations(); }
+    var ps=(s.psalms||[]).map(psalmById).filter(Boolean);
+    var sg=(s.songs||[]).map(songByRef).filter(Boolean);
+    var html='<button class="back" id="back">‹ All situations</button>'
+      + '<div class="card" style="text-align:center;background:linear-gradient(165deg,#1d3a60,#15294460)"><div style="font-size:34px">'+(s.emoji||'🙏')+'</div>'
+      + '<h3 style="font-size:20px;margin:6px 0 4px">'+esc(s.situation||'')+'</h3>'
+      + (s.note?'<div class="when" style="text-align:center">'+esc(s.note)+'</div>':'')+'</div>';
+    if(ps.length){ html+='<div class="sechead"><span>📖 Psalms to read</span><span class="n">'+ps.length+'</span></div>'+ps.map(psalmCard).join(''); }
+    if(sg.length){ html+='<div class="sechead"><span>🎵 Songs to sing</span><span class="n">'+sg.length+'</span></div>'+sg.map(songCard).join(''); }
+    if(!ps.length&&!sg.length) html+='<div class="empty">—</div>';
+    view.innerHTML=html;
+    document.getElementById('back').onclick=function(){ state.detail=null; render(); };
+    bindCards();
+  }
+
+  function filterChips(cats, cur, setter){
+    var chips='<div class="chipbar"><button class="fchip'+(!cur?' on':'')+'" data-fc="">All</button>'
+      + cats.map(function(c){ return '<button class="fchip'+(cur===c?' on':'')+'" data-fc="'+esc(c)+'">'+esc(c)+'</button>'; }).join('')+'</div>';
+    return chips;
+  }
+  function bindChips(setter){ view.querySelectorAll('[data-fc]').forEach(function(b){ b.onclick=function(){ setter(b.getAttribute('data-fc')||null); render(); }; }); }
+
+  function vPsalms(){
+    var q=state.q, cats=uniq(D.psalms.map(function(p){return p.category;}));
+    var list=D.psalms.slice();
+    if(state.favOnly) list=list.filter(function(p){return favs.psalms[p.number];});
+    if(state.psCat) list=list.filter(function(p){return p.category===state.psCat;});
+    if(q) list=list.filter(function(p){ return (('psalm '+p.number+' '+(p.title||'')+' '+(p.situation||'')+' '+(p.key_verse_quote||'')+' '+(p.category||'')+' '+(p.mood||'')).toLowerCase().indexOf(q)>=0); });
+    view.innerHTML = savedToggle('psalms') + filterChips(cats,state.psCat,function(c){state.psCat=c;})
+      + '<div class="count">'+list.length+' of 150 psalms</div>'
+      + (list.length? list.map(psalmCard).join('') : '<div class="empty">Nothing matches.</div>');
+    bindSaved('psalms'); bindChips(function(c){state.psCat=c;}); bindCards();
+  }
+  function vSongs(){
+    var q=state.q, cats=uniq(D.songs.map(function(s){return s.category;}));
+    var list=D.songs.slice();
+    if(state.favOnly) list=list.filter(function(s){return favs.songs[s.reference];});
+    if(state.scat) list=list.filter(function(s){return s.category===state.scat;});
+    if(q) list=list.filter(function(s){ return (((s.title||'')+' '+(s.reference||'')+' '+(s.singer||'')+' '+(s.situation||'')+' '+(s.key_line_quote||'')+' '+(s.category||'')).toLowerCase().indexOf(q)>=0); });
+    view.innerHTML = savedToggle('songs') + filterChips(cats,state.scat,function(c){state.scat=c;})
+      + '<div class="count">'+list.length+' of 60 songs</div>'
+      + (list.length? list.map(songCard).join(''):'<div class="empty">Nothing matches.</div>');
+    bindSaved('songs'); bindChips(function(c){state.scat=c;}); bindCards();
+  }
+
+  function vPrayers(){
+    var subs=[['kinds','By kind'],['great','Great prayers'],['patterns','Patterns'],['outcomes','Outcomes']];
+    var sub='<div class="subnav">'+subs.map(function(s){return '<button class="subtab'+(state.sub===s[0]?' on':'')+'" data-sub="'+s[0]+'">'+s[1]+'</button>';}).join('')+'</div>';
+    var body='';
+    var q=state.q;
+    if(q){ // global prayer search overrides sub
+      var res=D.prayers.filter(function(p){ return (((p.pray_er||'')+' '+(p.reference||'')+' '+(p.content||'')+' '+(p.result||'')+' '+(p.category||'')+' '+(p.quote||'')).toLowerCase().indexOf(q)>=0); });
+      body='<div class="count">'+res.length+' prayers match “'+esc(q)+'”</div>'+(res.length?res.slice(0,120).map(prayerCard).join(''):'<div class="empty">No prayers match.</div>');
+      view.innerHTML=sub+body; bindSub(); bindCards(); return;
+    }
+    if(state.favOnly){ var f=D.prayers.filter(function(p){return favs.prayers[p.reference];});
+      view.innerHTML=sub+savedToggle('prayers')+'<div class="count">'+f.length+' saved</div>'+(f.length?f.map(prayerCard).join(''):'<div class="empty">No saved prayers yet — tap ☆ on any prayer.</div>'); bindSub(); bindSaved('prayers'); bindCards(); return; }
+
+    if(state.sub==='kinds'){
+      if(state.pcat){ var pl=D.prayers.filter(function(p){return p.catName===state.pcat;});
+        body='<button class="back" id="back">‹ All kinds</button><div class="sechead"><span>'+esc(state.pcat)+'</span><span class="n">'+pl.length+'</span></div>'+pl.map(prayerCard).join('');
+        view.innerHTML=sub+body; bindSub(); document.getElementById('back').onclick=function(){state.pcat=null;render();}; bindCards(); return;
+      }
+      body=savedToggle('prayers')+'<div class="count">532 prayers · 17 kinds — tap one</div><div class="tiles">'+
+        D.prayerCategories.map(function(c){ return '<div class="tile" data-pcat="'+esc(c.name)+'"><span class="lab">'+esc(c.name)+'</span><span class="when" style="margin:0">'+(c.count||'')+' prayers</span></div>'; }).join('')+'</div>';
+      view.innerHTML=sub+body; bindSub(); bindSaved('prayers');
+      view.querySelectorAll('[data-pcat]').forEach(function(t){ t.onclick=function(){ state.pcat=t.getAttribute('data-pcat'); window.scrollTo(0,0); render(); }; });
+      return;
+    }
+    if(state.sub==='great'){
+      body='<div class="count">24 landmark prayers to study</div>'+D.greatPrayers.map(function(g){
+        return '<div class="card"><div class="row"><h3>'+esc(g.who)+'</h3><span class="pill">'+esc(g.reference)+'</span></div><div class="meta">'+esc(g.why)+'</div>'
+          +'<div class="acts">'+spkBtn((g.who||'')+'. '+(g.reference||''))+'</div></div>'; }).join('');
+      view.innerHTML=sub+body; bindSub(); bindCards(); return;
+    }
+    if(state.sub==='patterns'){
+      body='<div class="verse-top">What God answers — and how</div>'+D.prayerPatterns.map(function(p){
+        return '<div class="card"><h3>'+esc(p.pattern)+'</h3><div class="meta">'+esc(p.insight)+'</div>'
+          +(p.examples&&p.examples.length?'<div class="when" style="margin-top:7px">'+p.examples.map(esc).join(' · ')+'</div>':'')+'</div>'; }).join('');
+      view.innerHTML=sub+body; bindSub(); return;
+    }
+    if(state.sub==='outcomes'){
+      body='<div class="verse-top">“Answered” is bigger than “granted”</div>'+D.prayerOutcomes.map(function(o){
+        return '<div class="card"><div class="row"><h3>'+esc(OUTCOME_BADGE[o.type]||o.type)+'</h3><span class="pill">'+(o.count||'')+'</span></div><div class="meta">'+esc(o.meaning)+'</div>'
+          +(o.examples&&o.examples.length?'<div class="when" style="margin-top:7px">'+o.examples.map(esc).join(' · ')+'</div>':'')+'</div>'; }).join('');
+      view.innerHTML=sub+body; bindSub(); return;
+    }
+  }
+  function bindSub(){ view.querySelectorAll('[data-sub]').forEach(function(b){ b.onclick=function(){ state.sub=b.getAttribute('data-sub'); state.pcat=null; state.favOnly=false; window.scrollTo(0,0); render(); }; }); }
+
+  function savedToggle(kind){ var n=Object.keys(favs[kind]||{}).length;
+    return '<div class="chipbar"><button class="fchip'+(state.favOnly?' on':'')+'" id="savedToggle">★ Saved'+(n?' ('+n+')':'')+'</button></div>'; }
+  function bindSaved(kind){ var b=document.getElementById('savedToggle'); if(b) b.onclick=function(){ state.favOnly=!state.favOnly; render(); }; }
+
+  function uniq(a){ var o={},r=[]; a.forEach(function(x){ if(x&&!o[x]){o[x]=1;r.push(x);} }); return r; }
+
+  function render(){
+    buildNav();
+    if(state.tab==='situations') vSituations();
+    else if(state.tab==='psalms') vPsalms();
+    else if(state.tab==='songs') vSongs();
+    else if(state.tab==='prayers') vPrayers();
+  }
+  render();
+
+  if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
+    window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  }
+})();
+</script>
+<script src="install-button.js" defer></script>
+</body>
+</html>
