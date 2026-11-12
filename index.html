@@ -165,9 +165,16 @@
   function saveFavs(){ try{ localStorage.setItem('pss_favs', JSON.stringify(favs)); }catch(e){} }
 
   // ---- voice ----
+  // Read-aloud normalization: "1 Peter"->"First Peter", "118:24"->"118 verse 24", "4-6"->"4 to 6", "___"->silent pause.
+  function sayable(s){ return String(s==null?'':s)
+    .replace(/\b([123])\s+(Samuel|Kings|Chronicles|Corinthians|Thessalonians|Timothy|Peter|John)\b/g,function(m,d,b){return (d==='1'?'First':d==='2'?'Second':'Third')+' '+b;})
+    .replace(/(\d)\s*:\s*(\d)/g,'$1 verse $2')
+    .replace(/(\d)\s*[-–—]\s*(\d)/g,'$1 to $2')
+    .replace(/_{2,}/g,' , ')
+    .replace(/\s+([,.;:!?])/g,'$1').replace(/,\s*([.!?;:])/g,'$1').replace(/\s+/g,' ').trim(); }
   function speak(text){
     if(!voiceOn || !('speechSynthesis' in window)) return;
-    try{ var u=new SpeechSynthesisUtterance(text); u.rate=0.9; u.pitch=1.0;
+    try{ var u=new SpeechSynthesisUtterance(sayable(text)); u.rate=0.9; u.pitch=1.0;
       var vs=speechSynthesis.getVoices(); var en=vs.filter(function(v){return /^en/i.test(v.lang);});
       if(en.length) u.voice = en.find(function(v){return /US|GB/i.test(v.lang);})||en[0];
       speechSynthesis.cancel(); speechSynthesis.speak(u);
@@ -179,7 +186,7 @@
     try{ speechSynthesis.cancel(); var voice=getVoice(), chunks=[], cur='';
       verses.forEach(function(x){ var t=(x.t||'')+' '; if((cur+t).length>240){ if(cur)chunks.push(cur); cur=t; } else cur+=t; });
       if(cur) chunks.push(cur);
-      chunks.forEach(function(c){ var u=new SpeechSynthesisUtterance(c); u.rate=0.9; u.pitch=1.0; if(voice)u.voice=voice; speechSynthesis.speak(u); });
+      chunks.forEach(function(c){ var u=new SpeechSynthesisUtterance(sayable(c)); u.rate=0.9; u.pitch=1.0; if(voice)u.voice=voice; speechSynthesis.speak(u); });
     }catch(e){}
   }
   if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged=function(){}; speechSynthesis.getVoices(); }
